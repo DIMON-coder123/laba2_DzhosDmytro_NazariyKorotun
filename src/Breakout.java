@@ -1,8 +1,8 @@
 /*
  * File: Breakout.java
  * -------------------
- * Name:
- * Section Leader:
+ * Name: BreakOut game
+ * Section Leader: Dzhos Dmytro + Korotun Nazariy
  *
  * This file will eventually implement the game of Breakout.
  */
@@ -11,7 +11,14 @@ import acm.graphics.*;
 import acm.program.*;
 import acm.util.*;
 
+import java.awt.*;
+import java.awt.event.MouseEvent;
+
 public class Breakout extends GraphicsProgram {
+
+
+    public static GRect PADDLE;
+
 
     /** Width and height of application window in pixels */
     public static final int APPLICATION_WIDTH = 400;
@@ -53,10 +60,38 @@ public class Breakout extends GraphicsProgram {
     /** Number of turns */
     private static final int NTURNS = 3;
 
+
+    private void drawOneBrick(double x, double y, Color color) {
+        GRect brick = new GRect(x, y, BRICK_WIDTH, BRICK_HEIGHT);
+        brick.setColor(color);
+        brick.setFilled(true);
+        add(brick);
+    }
+
+    private void drawPaddle (double x, double y) {
+        PADDLE = new GRect(x, y, PADDLE_WIDTH, PADDLE_HEIGHT);
+        PADDLE.setColor(Color.BLACK);
+        PADDLE.setFilled(true);
+        add(PADDLE);
+    }
+
+    public void init() {
+        addMouseListeners();
+    }
+
+    public void mouseMoved(MouseEvent e) {
+        double x = e.getX();
+        remove(PADDLE);
+        drawPaddle(x, PADDLE.getY());
+    }
+
+
     /* Method: run() */
     /** Runs the Breakout program. */
     public void run() {
         /* You fill this in, along with any subsidiary methods */
+        this.setSize(WIDTH, HEIGHT);
+        drawPaddle(getWidth() / 2, getHeight() - PADDLE_Y_OFFSET);
 
     }
 
