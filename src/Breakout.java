@@ -57,14 +57,22 @@ public class Breakout extends GraphicsProgram {
     /** Number of turns */
     private static final int NTURNS = 3;
 
+    /** Speed for the ball*/
     private double vx, vy;
+
+    /** Params for built-in functions*/
+
     private final RandomGenerator rgen = RandomGenerator.getInstance();
     private final int DELAY = 30;
+
+
     private int LIFES = 3;
     private final double speedBoost = 1;
     public static GRect PADDLE;
     public static GOval BALL;
     public static GImage heart1, heart2, heart3;
+    public static GLine Trace;
+    private boolean gameOver = false;
 
     private void drawOneBrick(double x, double y, Color color) {
         GRect brick = new GRect(x, y, BRICK_WIDTH, BRICK_HEIGHT);
@@ -85,12 +93,14 @@ public class Breakout extends GraphicsProgram {
     }
 
     public void mouseMoved(MouseEvent e) {
-        double x = e.getX();
-        remove(PADDLE);
-        PADDLE.setLocation(x, PADDLE.getY());
-        checkCollisionWithLeftWall();
-        checkCollisionWithRightWall();
-        drawPaddle(PADDLE.getX(), PADDLE.getY());
+        if (gameOver == false) {
+            double x = e.getX();
+            remove(PADDLE);
+            PADDLE.setLocation(x, PADDLE.getY());
+            checkCollisionWithLeftWall();
+            checkCollisionWithRightWall();
+            drawPaddle(PADDLE.getX(), PADDLE.getY());
+        }
     }
 
     private void checkCollisionWithLeftWall() {
@@ -127,6 +137,11 @@ public class Breakout extends GraphicsProgram {
         pause(DELAY);
     }
 
+    private void drawTraceLine(double x, double y) {
+        Trace = new GLine(x, y, x + vx, y + vy);
+        add(Trace);
+    }
+
     private void checkBallCollisionWithWalls() {
         if (BALL.getX() < 0 || BALL.getX() > getWidth() - BALL.getWidth())
             vx *= -speedBoost;
@@ -153,7 +168,7 @@ public class Breakout extends GraphicsProgram {
     }
 
     private void setBall() {
-        drawBall(getWidth() / 2, getHeight() / 2 );
+        drawBall(getWidth() / 2 - BALL_RADIUS / 2, getHeight() / 2 - BALL_RADIUS / 2 );
         setBallSpeed();
     }
 
@@ -230,32 +245,35 @@ public class Breakout extends GraphicsProgram {
         /* You fill this in, along with any subsidiary methods */
         this.setSize(WIDTH * 3 / 2, HEIGHT);
 
-        drawPaddle(getWidth() / 2, getHeight() - PADDLE_Y_OFFSET);
-
+        drawPaddle(getWidth() / 2 - PADDLE_WIDTH / 2, getHeight() - PADDLE_Y_OFFSET);
         setBall();
+
         drawNeededHearts(3);
-        while (LIFES > 0) {
+        while (LIFES > 0 && !gameOver) {
+
             moveBall();
+            drawTraceLine(BALL.getX(), BALL.getY());
 
             checkBallCollisionWithWalls();
 
             checkBallCollisionWithBottomWall();
             if (vx == 0 && vy == 0){
                 pause(1000);
-                remove(BALL);
-                deleteNeededHearts(LIFES);
+                removeAll();
+                drawPaddle(getWidth() / 2 - PADDLE_WIDTH / 2, getHeight() - PADDLE_Y_OFFSET);
+                setBall();
                 LIFES--;
                 if (LIFES == 0)
-                    break;
+                    gameOver = true;
                 drawNeededHearts(LIFES);
-                setBall();
 
             }
            checkBallCollisionWithTopWall();
 
            checkCollisionWithPaddle();
         }
-
+        GLine center = new GLine(getWidth() / 2, 0, getWidth() / 2,getHeight());
+        add(center);
     }
 
 }
