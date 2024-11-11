@@ -82,8 +82,22 @@ public class Breakout extends GraphicsProgram {
     public void mouseMoved(MouseEvent e) {
         double x = e.getX();
         remove(PADDLE);
-        drawPaddle(x, PADDLE.getY());
+        PADDLE.setLocation(x, PADDLE.getY());
+        checkCollisionWithLeftWall();
+        checkCollisionWithRightWall();
+        drawPaddle(PADDLE.getX(), PADDLE.getY());
     }
+
+    private void checkCollisionWithLeftWall() {
+        if (PADDLE.getX() <= 0)
+            PADDLE.setLocation(0, PADDLE.getY());
+    }
+
+    private void checkCollisionWithRightWall() {
+        if (PADDLE.getX() >= getWidth() - PADDLE.getWidth())
+            PADDLE.setLocation(getWidth()  - PADDLE.getWidth(), PADDLE.getY());
+    }
+
 
 
     /* Method: run() */
