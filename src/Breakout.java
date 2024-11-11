@@ -18,6 +18,7 @@ public class Breakout extends GraphicsProgram {
 
 
     public static GRect PADDLE;
+    public static GOval BALL;
 
 
     /** Width and height of application window in pixels */
@@ -60,6 +61,9 @@ public class Breakout extends GraphicsProgram {
     /** Number of turns */
     private static final int NTURNS = 3;
 
+    private double vx, vy;
+    private RandomGenerator rgen = RandomGenerator.getInstance();
+    private int DELAY = 30;
 
     private void drawOneBrick(double x, double y, Color color) {
         GRect brick = new GRect(x, y, BRICK_WIDTH, BRICK_HEIGHT);
@@ -99,6 +103,56 @@ public class Breakout extends GraphicsProgram {
     }
 
 
+    private void drawBall(double x, double y) {
+        BALL = new GOval(x, y, BALL_RADIUS, BALL_RADIUS);
+        BALL.setFilled(true);
+        BALL.setColor(Color.BLACK);
+        add(BALL);
+    }
+
+    private void setBallSpeed() {
+        vx = rgen.nextDouble(1.0, 5.0);
+        if (rgen.nextBoolean(0.5))
+            vx = -vx;
+        vy = rgen.nextDouble(1.0, 5.0);
+        if (rgen.nextBoolean(0.5))
+            vy = -vy;
+    }
+
+    private void moveBall() {
+        remove(BALL);
+        BALL.setLocation(BALL.getX() + vx, BALL.getY() + vy);
+        BALL.move(vx, vy);
+        drawBall(BALL.getX(), BALL.getY());
+        pause(DELAY);
+    }
+
+    private void checkBallCollisionWithWalls() {
+        if (BALL.getX() < 0 || BALL.getX() > getWidth() - BALL.getWidth())
+            vx *= -1;
+    }
+
+    private void checkBallCollisionWithTopWall() {
+        if (BALL.getY() < 0) {
+            //vx = 0;
+            vy *= -1;
+        }
+
+    }
+
+    private void checkBallCollisionWithBottomWall() {
+        if (BALL.getY() + BALL.getHeight() > getHeight()) {
+            vy *= -1;
+            //vx = 0;
+        }
+    }
+
+    public void checkCollisionWithPaddle() {
+        if (PADDLE.getBounds().contains(BALL.getX() + BALL.getWidth(), BALL.getY() + BALL.getHeight())) {
+            vy *= -1;
+        }
+    }
+
 
     /* Method: run() */
     /** Runs the Breakout program. */
@@ -106,6 +160,15 @@ public class Breakout extends GraphicsProgram {
         /* You fill this in, along with any subsidiary methods */
         this.setSize(WIDTH, HEIGHT);
         drawPaddle(getWidth() / 2, getHeight() - PADDLE_Y_OFFSET);
+        setBallSpeed();
+        drawBall(getWidth() / 2, getHeight() / 2 );
+        while (true) {
+           moveBall();
+           checkBallCollisionWithWalls();
+           checkBallCollisionWithBottomWall();
+           checkBallCollisionWithTopWall();
+           checkCollisionWithPaddle();
+        }
 
     }
 
