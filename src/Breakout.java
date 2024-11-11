@@ -17,10 +17,6 @@ import java.awt.event.MouseEvent;
 public class Breakout extends GraphicsProgram {
 
 
-    public static GRect PADDLE;
-    public static GOval BALL;
-
-
     /** Width and height of application window in pixels */
     public static final int APPLICATION_WIDTH = 400;
     public static final int APPLICATION_HEIGHT = 600;
@@ -62,8 +58,13 @@ public class Breakout extends GraphicsProgram {
     private static final int NTURNS = 3;
 
     private double vx, vy;
-    private RandomGenerator rgen = RandomGenerator.getInstance();
-    private int DELAY = 30;
+    private final RandomGenerator rgen = RandomGenerator.getInstance();
+    private final int DELAY = 30;
+    private int LIFES = 3;
+    private final double speedBoost = 1;
+    public static GRect PADDLE;
+    public static GOval BALL;
+    public static GImage heart1, heart2, heart3;
 
     private void drawOneBrick(double x, double y, Color color) {
         GRect brick = new GRect(x, y, BRICK_WIDTH, BRICK_HEIGHT);
@@ -102,7 +103,6 @@ public class Breakout extends GraphicsProgram {
             PADDLE.setLocation(getWidth()  - PADDLE.getWidth(), PADDLE.getY());
     }
 
-
     private void drawBall(double x, double y) {
         BALL = new GOval(x, y, BALL_RADIUS, BALL_RADIUS);
         BALL.setFilled(true);
@@ -129,28 +129,98 @@ public class Breakout extends GraphicsProgram {
 
     private void checkBallCollisionWithWalls() {
         if (BALL.getX() < 0 || BALL.getX() > getWidth() - BALL.getWidth())
-            vx *= -1;
+            vx *= -speedBoost;
     }
 
     private void checkBallCollisionWithTopWall() {
         if (BALL.getY() < 0) {
-            //vx = 0;
-            vy *= -1;
+            vy *= -speedBoost;
         }
 
     }
 
     private void checkBallCollisionWithBottomWall() {
         if (BALL.getY() + BALL.getHeight() > getHeight()) {
-            vy *= -1;
-            //vx = 0;
+            vy = 0;
+            vx = 0;
         }
     }
 
     public void checkCollisionWithPaddle() {
         if (PADDLE.getBounds().contains(BALL.getX() + BALL.getWidth(), BALL.getY() + BALL.getHeight())) {
-            vy *= -1;
+            vy *= -speedBoost;
         }
+    }
+
+    private void setBall() {
+        drawBall(getWidth() / 2, getHeight() / 2 );
+        setBallSpeed();
+    }
+
+    private void addHeart1(double x, double y) {
+        heart1 = new GImage("heart-removebg-preview.png", x ,y);
+        heart1.scale(0.1, 0.1);
+        add(heart1);
+    }
+
+    private void addHeart2(double x, double y) {
+        heart2 = new GImage("heart-removebg-preview.png", x  + heart1.getWidth(), y);
+        heart2.scale(0.1, 0.1);
+        add(heart2);
+    }
+
+    private void addHeart3(double x, double y) {
+        heart3 = new GImage("heart-removebg-preview.png", x + 2 * heart1.getWidth(), y);
+        heart3.scale(0.1, 0.1);
+        add(heart3);
+    }
+
+    private void deleteALlHearts() {
+        remove(heart1);
+        remove(heart2);
+        remove(heart3);
+    }
+
+    private void drawAllHearts(double x, double y) {
+        addHeart1(x, y);
+        addHeart2(x, y);
+        addHeart3(x, y);
+    }
+
+    private void drawTwoHearts(double x, double y) {
+        addHeart1(x, y);
+        addHeart2(x, y);
+    }
+
+    private void deleteTwoHearts() {
+        remove(heart1);
+        remove(heart2);
+    }
+
+    private void drawOneHeart(double x, double y) {
+        addHeart1(x, y);
+    }
+
+    private void deleteOneHeart() {
+        remove(heart1);
+    }
+
+    private void drawNeededHearts(int amount) {
+        if (amount == 1)
+            drawOneHeart(0,0);
+        if (amount == 2)
+            drawTwoHearts(0,0);
+        if (amount == 3)
+            drawAllHearts(0,0);
+    }
+
+    private void deleteNeededHearts(int amount) {
+        if (amount == 1)
+            deleteOneHeart();
+        if (amount == 2)
+            deleteTwoHearts();
+        if (amount == 3)
+            deleteALlHearts();
     }
 
 
@@ -158,15 +228,31 @@ public class Breakout extends GraphicsProgram {
     /** Runs the Breakout program. */
     public void run() {
         /* You fill this in, along with any subsidiary methods */
-        this.setSize(WIDTH, HEIGHT);
+        this.setSize(WIDTH * 3 / 2, HEIGHT);
+
         drawPaddle(getWidth() / 2, getHeight() - PADDLE_Y_OFFSET);
-        setBallSpeed();
-        drawBall(getWidth() / 2, getHeight() / 2 );
-        while (true) {
-           moveBall();
-           checkBallCollisionWithWalls();
-           checkBallCollisionWithBottomWall();
+
+        setBall();
+        drawNeededHearts(3);
+        while (LIFES > 0) {
+            moveBall();
+
+            checkBallCollisionWithWalls();
+
+            checkBallCollisionWithBottomWall();
+            if (vx == 0 && vy == 0){
+                pause(1000);
+                remove(BALL);
+                deleteNeededHearts(LIFES);
+                LIFES--;
+                if (LIFES == 0)
+                    break;
+                drawNeededHearts(LIFES);
+                setBall();
+
+            }
            checkBallCollisionWithTopWall();
+
            checkCollisionWithPaddle();
         }
 
