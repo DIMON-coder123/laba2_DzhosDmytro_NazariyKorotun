@@ -26,7 +26,7 @@ public class Breakout extends GraphicsProgram {
     private static final int HEIGHT = APPLICATION_HEIGHT;
 
     /** Dimensions of the paddle */
-    private static final int PADDLE_WIDTH = 60;
+    private static final int PADDLE_WIDTH = 120;
     private static final int PADDLE_HEIGHT = 10;
 
     /** Offset of the paddle up from the bottom */
@@ -42,8 +42,7 @@ public class Breakout extends GraphicsProgram {
     private static final int BRICK_SEP = 4;
 
     /** Width of a brick */
-    private static double BRICK_WIDTH =
-            (WIDTH - (NBRICKS_PER_ROW - 1) * BRICK_SEP) / NBRICKS_PER_ROW;
+    private static double BRICK_WIDTH;
 
     /** Height of a brick */
     private static final int BRICK_HEIGHT = 8;
@@ -54,25 +53,24 @@ public class Breakout extends GraphicsProgram {
     /** Offset of the top brick row from the top */
     private static final int BRICK_Y_OFFSET = 70;
 
-    /** Number of turns */
-    private static final int NTURNS = 3;
-
     /** Speed for the ball*/
     private double vx, vy;
 
     /** Params for built-in functions*/
 
     private final RandomGenerator rgen = RandomGenerator.getInstance();
-    private final int DELAY = 30;
+    private final int DELAY = 10;
 
 
     private int LIFES = 3;
-    private final double speedBoost = 1.1;
+    private final double speedBoost = 1.005;
     public static GRect PADDLE;
     public static GOval BALL;
     public static GImage heart1, heart2, heart3;
     public static GLine Trace;
     private boolean gameOver = false;
+    private int amountOFBricks = NBRICKS_PER_ROW * NBRICK_ROWS;
+    public GRect FIELD;
 
     private void drawPaddle (double x, double y) {
         PADDLE = new GRect(x, y, PADDLE_WIDTH, PADDLE_HEIGHT);
@@ -86,7 +84,7 @@ public class Breakout extends GraphicsProgram {
     }
 
     public void mouseMoved(MouseEvent e) {
-        if (gameOver == false) {
+        if (!gameOver) {
             double x = e.getX();
             remove(PADDLE);
             PADDLE.setLocation(x, PADDLE.getY());
@@ -102,8 +100,8 @@ public class Breakout extends GraphicsProgram {
     }
 
     private void checkCollisionWithRightWall() {
-        if (PADDLE.getX() >= getWidth() - PADDLE.getWidth())
-            PADDLE.setLocation(getWidth()  - PADDLE.getWidth(), PADDLE.getY());
+        if (PADDLE.getX() >= FIELD.getWidth()- PADDLE.getWidth())
+            PADDLE.setLocation(FIELD.getWidth()  - PADDLE.getWidth(), PADDLE.getY());
     }
 
     private void drawBall(double x, double y) {
@@ -136,7 +134,7 @@ public class Breakout extends GraphicsProgram {
     }
 
     private void checkBallCollisionWithWalls() {
-        if (BALL.getX() < 0 || BALL.getX() > getWidth() - BALL.getWidth())
+        if (BALL.getX() < 0 || BALL.getX() > FIELD.getWidth()- BALL.getWidth())
             vx *= -speedBoost;
     }
 
@@ -158,10 +156,11 @@ public class Breakout extends GraphicsProgram {
         if (PADDLE.getBounds().contains(BALL.getX() + BALL.getWidth(), BALL.getY() + BALL.getHeight())) {
             vy *= -speedBoost;
         }
+
     }
 
     private void setBall() {
-        drawBall(getWidth() / 2 - BALL_RADIUS / 2, getHeight() / 2 - BALL_RADIUS / 2 );
+        drawBall(FIELD.getWidth() / 2 - BALL_RADIUS / 2, getHeight() / 2 - BALL_RADIUS / 2 );
         setBallSpeed();
     }
 
@@ -215,11 +214,11 @@ public class Breakout extends GraphicsProgram {
 
     private void drawNeededHearts(int amount) {
         if (amount == 1)
-            drawOneHeart(0,0);
+            drawOneHeart(FIELD.getWidth(),0);
         if (amount == 2)
-            drawTwoHearts(0,0);
+            drawTwoHearts(FIELD.getWidth(),0);
         if (amount == 3)
-            drawAllHearts(0,0);
+            drawAllHearts(FIELD.getWidth(),0);
     }
 
     private void deleteNeededHearts(int amount) {
@@ -240,8 +239,8 @@ public class Breakout extends GraphicsProgram {
 
     private void renderALlBricks() {
         Color c = Color.red;
-        for (int i = 0; i < NBRICK_ROWS; i++) {
-            for (int j = 0; j < NBRICKS_PER_ROW; j++) {
+        for (int i = 0; i < NBRICKS_PER_ROW; i++) {
+            for (int j = 0; j < NBRICK_ROWS; j++) {
                 switch (j) {
                     case 0:
                         c = Color.RED;
@@ -285,28 +284,99 @@ public class Breakout extends GraphicsProgram {
 
     // TO FIX
     public void checkCollisionBallWithBrick() {
-       if ((getElementAt(BALL.getX() ,BALL.getY()) != null) && (getElementAt(BALL.getX() ,BALL.getY() ) != BALL) && (getElementAt(BALL.getX() ,BALL.getY() ) != PADDLE)) {
-           remove(getElementAt(BALL.getX() , BALL.getY() ));
-           vy *= -1;
+            boolean isCollision = false;
+            if ((getElementAt(BALL.getX() ,BALL.getY()) != null)
+                && (getElementAt(BALL.getX(),BALL.getY()) != FIELD)
+                && (getElementAt(BALL.getX(),BALL.getY() ) != PADDLE)
+                && (getElementAt(BALL.getX() ,PADDLE.getX()) != heart1)
+                && (getElementAt(BALL.getX() ,PADDLE.getX()) != heart2)
+                && (getElementAt(BALL.getX() ,PADDLE.getX()) != heart3)
+                && !isCollision
+            ) {
+                remove(getElementAt(BALL.getX() , BALL.getY() ));
+                vy *= -1;
+                amountOFBricks--;
+                isCollision = true;
+                pause(DELAY);
+            }
+            if ((getElementAt(BALL.getX() + BALL.getWidth(),BALL.getY()) != null)
+            && (getElementAt(BALL.getX() + BALL.getWidth(),BALL.getY()) != FIELD)
+            && (getElementAt(BALL.getX()+ BALL.getWidth(),BALL.getY() ) != PADDLE)
+            && (getElementAt(BALL.getX()+ BALL.getWidth(),BALL.getY() ) != heart1)
+            && (getElementAt(BALL.getX()+ BALL.getWidth(),BALL.getY() ) != heart2)
+            && (getElementAt(BALL.getX()+ BALL.getWidth(),BALL.getY() ) != heart3)
+            && !isCollision
+            ) {
+                remove(getElementAt(BALL.getX() + BALL.getWidth(), BALL.getY() ));
+                vy *= -1;
+                amountOFBricks--;
+                isCollision = true;
+                pause(DELAY);
+            } {
+            if ((getElementAt(BALL.getX() ,BALL.getY() + BALL.getHeight()) != null)
+            && (getElementAt(BALL.getX() ,BALL.getY() + BALL.getHeight()) != FIELD)
+            && (getElementAt(BALL.getX(),BALL.getY() + BALL.getHeight()) != PADDLE)
+            && (getElementAt(BALL.getX(),BALL.getY() + BALL.getHeight()) != heart1)
+            && (getElementAt(BALL.getX(),BALL.getY() + BALL.getHeight()) != heart2)
+            && (getElementAt(BALL.getX(),BALL.getY() + BALL.getHeight()) != heart3)
+            && !isCollision
+            ) {
+                remove(getElementAt(BALL.getX() , BALL.getY() + BALL.getHeight()));
+                vy *= -1;
+                amountOFBricks--;
+                isCollision = true;
+                pause(10);
+            }
+            if ((getElementAt(BALL.getX() + BALL.getWidth(),BALL.getY() + BALL.getHeight()) != null)
+               && (getElementAt(BALL.getX() + BALL.getWidth(),BALL.getY() + BALL.getHeight()) != FIELD)
+               && (getElementAt(BALL.getX()+ BALL.getWidth(),BALL.getY() + BALL.getHeight()) != PADDLE)
+               && (getElementAt(BALL.getX()+ BALL.getWidth(),BALL.getY() + BALL.getHeight()) != heart1)
+               && (getElementAt(BALL.getX()+ BALL.getWidth(),BALL.getY() + BALL.getHeight()) != heart2)
+               && (getElementAt(BALL.getX()+ BALL.getWidth(),BALL.getY() + BALL.getHeight()) != heart3)
+                && !isCollision
+            ) {
+                remove(getElementAt(BALL.getX() + BALL.getWidth(), BALL.getY() + BALL.getHeight()));
+                vy *= -1;
+                amountOFBricks--;
+                isCollision = true;
+                pause(10);
+            }
+
+
        }
+
+
+
     }
 
+    private void addField(double x, double y) {
+        FIELD = new GRect(x, y, x + 3 * WIDTH / 2, y + HEIGHT);
+        add(FIELD);
+    }
+
+    private void resultLabel(String str) {
+        GLabel label = new GLabel(str, FIELD.getWidth(), FIELD.getHeight() / 2);
+        label.setFont("Italic-30");
+        add(label);
+    }
 
     /* Method: run() */
     /** Runs the Breakout program. */
     public void run() {
         /* You fill this in, along with any subsidiary methods */
-        this.setSize(WIDTH * 3 / 2, HEIGHT);
-        BRICK_WIDTH = (getWidth() - (NBRICKS_PER_ROW - 1) * BRICK_SEP) / NBRICKS_PER_ROW;
-        renderALlBricks();
-        drawPaddle(getWidth() / 2 - PADDLE_WIDTH / 2, getHeight() - PADDLE_Y_OFFSET);
+        this.setSize(WIDTH * 2, HEIGHT + 60);
+        addField(0,0);
         setBall();
 
+        BRICK_WIDTH = (FIELD.getWidth() - (NBRICKS_PER_ROW + 1) * BRICK_SEP) / NBRICKS_PER_ROW;
+        renderALlBricks();
+        drawPaddle(FIELD.getWidth()  / 2 - PADDLE_WIDTH / 2, FIELD.getHeight() - PADDLE_Y_OFFSET);
+
+
         drawNeededHearts(3);
-        while (LIFES > 0 && !gameOver) {
+        while (LIFES > 0 && !gameOver && amountOFBricks > 0) {
 
             moveBall();
-            //drawTraceLine(BALL.getX(), BALL.getY());
             checkCollisionBallWithBrick();
             checkBallCollisionWithWalls();
 
@@ -315,22 +385,21 @@ public class Breakout extends GraphicsProgram {
                 pause(1000);
                 remove(BALL);
                 deleteNeededHearts(LIFES);
-                //removeAll();
-                //drawPaddle(getWidth() / 2 - PADDLE_WIDTH / 2, getHeight() - PADDLE_Y_OFFSET);
-                //renderALlBricks();
                 setBall();
                 LIFES--;
                 if (LIFES == 0)
                     gameOver = true;
                 drawNeededHearts(LIFES);
-
             }
            checkBallCollisionWithTopWall();
-
            checkCollisionWithPaddle();
         }
-        GLine center = new GLine(getWidth() / 2, 0, getWidth() / 2,getHeight());
-        add(center);
+
+        if (amountOFBricks == 0 && LIFES > 0)
+            resultLabel("You have won!!!");
+        else
+            resultLabel("You've lost");
     }
+
 
 }
