@@ -42,7 +42,7 @@ public class Breakout extends GraphicsProgram {
     private static final int BRICK_SEP = 4;
 
     /** Width of a brick */
-    private static final int BRICK_WIDTH =
+    private static double BRICK_WIDTH =
             (WIDTH - (NBRICKS_PER_ROW - 1) * BRICK_SEP) / NBRICKS_PER_ROW;
 
     /** Height of a brick */
@@ -67,19 +67,12 @@ public class Breakout extends GraphicsProgram {
 
 
     private int LIFES = 3;
-    private final double speedBoost = 1;
+    private final double speedBoost = 1.1;
     public static GRect PADDLE;
     public static GOval BALL;
     public static GImage heart1, heart2, heart3;
     public static GLine Trace;
     private boolean gameOver = false;
-
-    private void drawOneBrick(double x, double y, Color color) {
-        GRect brick = new GRect(x, y, BRICK_WIDTH, BRICK_HEIGHT);
-        brick.setColor(color);
-        brick.setFilled(true);
-        add(brick);
-    }
 
     private void drawPaddle (double x, double y) {
         PADDLE = new GRect(x, y, PADDLE_WIDTH, PADDLE_HEIGHT);
@@ -238,13 +231,74 @@ public class Breakout extends GraphicsProgram {
             deleteALlHearts();
     }
 
+    private void drawBrick(double x, double y, Color c) {
+        GRect brick = new GRect(x, y, BRICK_WIDTH, BRICK_HEIGHT);
+        brick.setColor(c);
+        brick.setFilled(true);
+        add(brick);
+    }
+
+    private void renderALlBricks() {
+        Color c = Color.red;
+        for (int i = 0; i < NBRICK_ROWS; i++) {
+            for (int j = 0; j < NBRICKS_PER_ROW; j++) {
+                switch (j) {
+                    case 0:
+                        c = Color.RED;
+                        break;
+                    case 1:
+                        c = Color.RED;
+                        break;
+                    case 2:
+                        c = Color.ORANGE;
+                        break;
+                    case 3:
+                        c = Color.ORANGE;
+                        break;
+                    case 4:
+                        c = Color.YELLOW;
+                        break;
+                    case 5:
+                        c = Color.YELLOW;
+                        break;
+                    case 6:
+                        c = Color.GREEN;
+                        break;
+                    case 7:
+                        c = Color.GREEN;
+                        break;
+                    case 8:
+                        c = Color.CYAN;
+                        break;
+                    case 9:
+                        c = Color.CYAN;
+                        break;
+                }
+                drawBrick((i + 1) * BRICK_SEP + i * BRICK_WIDTH,  BRICK_Y_OFFSET + j * BRICK_HEIGHT + j * BRICK_SEP, c);
+
+            }
+
+        }
+
+    }
+
+
+    // TO FIX
+    public void checkCollisionBallWithBrick() {
+       if ((getElementAt(BALL.getX() ,BALL.getY()) != null) && (getElementAt(BALL.getX() ,BALL.getY() ) != BALL) && (getElementAt(BALL.getX() ,BALL.getY() ) != PADDLE)) {
+           remove(getElementAt(BALL.getX() , BALL.getY() ));
+           vy *= -1;
+       }
+    }
+
 
     /* Method: run() */
     /** Runs the Breakout program. */
     public void run() {
         /* You fill this in, along with any subsidiary methods */
         this.setSize(WIDTH * 3 / 2, HEIGHT);
-
+        BRICK_WIDTH = (getWidth() - (NBRICKS_PER_ROW - 1) * BRICK_SEP) / NBRICKS_PER_ROW;
+        renderALlBricks();
         drawPaddle(getWidth() / 2 - PADDLE_WIDTH / 2, getHeight() - PADDLE_Y_OFFSET);
         setBall();
 
@@ -252,15 +306,18 @@ public class Breakout extends GraphicsProgram {
         while (LIFES > 0 && !gameOver) {
 
             moveBall();
-            drawTraceLine(BALL.getX(), BALL.getY());
-
+            //drawTraceLine(BALL.getX(), BALL.getY());
+            checkCollisionBallWithBrick();
             checkBallCollisionWithWalls();
 
             checkBallCollisionWithBottomWall();
             if (vx == 0 && vy == 0){
                 pause(1000);
-                removeAll();
-                drawPaddle(getWidth() / 2 - PADDLE_WIDTH / 2, getHeight() - PADDLE_Y_OFFSET);
+                remove(BALL);
+                deleteNeededHearts(LIFES);
+                //removeAll();
+                //drawPaddle(getWidth() / 2 - PADDLE_WIDTH / 2, getHeight() - PADDLE_Y_OFFSET);
+                //renderALlBricks();
                 setBall();
                 LIFES--;
                 if (LIFES == 0)
