@@ -12,6 +12,7 @@ import acm.program.*;
 import acm.util.*;
 
 import java.awt.*;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 
 public class Breakout extends GraphicsProgram {
@@ -27,6 +28,7 @@ public class Breakout extends GraphicsProgram {
 
     /** Dimensions of the paddle */
     private static final int PADDLE_WIDTH = 120;
+    private static final int MIN_PADDLE_WIDTH = 30;
     private static final int PADDLE_HEIGHT = 10;
 
     /** Offset of the paddle up from the bottom */
@@ -63,13 +65,13 @@ public class Breakout extends GraphicsProgram {
 
 
     private int LIFES = 3;
-    private final double speedBoost = 1.005;
+    private final double speedBoost = 1;
     public static GRect PADDLE;
     public static GOval BALL;
     public static GImage heart1, heart2, heart3;
 //    public static GLine Trace;
     private boolean gameOver = false;
-    private int amountOFBricks = NBRICKS_PER_ROW * NBRICK_ROWS;
+    private int amountOfBricks = NBRICKS_PER_ROW * NBRICK_ROWS;
     public GRect FIELD;
 
     private void drawPaddle (double x, double y) {
@@ -79,8 +81,23 @@ public class Breakout extends GraphicsProgram {
         add(PADDLE);
     }
 
+    private void changeWidthOfPaddle(int bricks) {
+        PADDLE.setSize(MIN_PADDLE_WIDTH + (PADDLE_WIDTH - MIN_PADDLE_WIDTH)* bricks / (NBRICK_ROWS * NBRICK_ROWS), PADDLE_HEIGHT);
+    }
+
+
     public void init() {
         addMouseListeners();
+        addKeyListeners();
+    }
+
+
+    public void keyPressed(KeyEvent e) {
+        int key = e.getKeyCode();
+        if (key == KeyEvent.VK_ESCAPE) {
+            vx = 0;
+            vy = 0;
+        }
     }
 
     public void mouseMoved(MouseEvent e) {
@@ -91,6 +108,7 @@ public class Breakout extends GraphicsProgram {
             checkCollisionWithLeftWall();
             checkCollisionWithRightWall();
             drawPaddle(PADDLE.getX(), PADDLE.getY());
+            changeWidthOfPaddle(amountOfBricks);
         }
     }
 
@@ -260,57 +278,49 @@ public class Breakout extends GraphicsProgram {
 
     // TO FIX
     public void checkCollisionBallWithBrick() {
-            if ((getElementAt(BALL.getX() ,BALL.getY()) != null)
+        if ((getElementAt(BALL.getX() ,BALL.getY()) != null)
                 && (getElementAt(BALL.getX(),BALL.getY()) != FIELD)
                 && (getElementAt(BALL.getX(),BALL.getY() ) != PADDLE)
-                && (getElementAt(BALL.getX() ,PADDLE.getX()) != heart1)
-                && (getElementAt(BALL.getX() ,PADDLE.getX()) != heart2)
-                && (getElementAt(BALL.getX() ,PADDLE.getX()) != heart3)
-            ) {
-                remove(getElementAt(BALL.getX() , BALL.getY() ));
-                vy *= -1;
-                amountOFBricks--;
-                pause(DELAY);
-            }
-            if ((getElementAt(BALL.getX() + BALL.getWidth(),BALL.getY()) != null)
-            && (getElementAt(BALL.getX() + BALL.getWidth(),BALL.getY()) != FIELD)
-            && (getElementAt(BALL.getX()+ BALL.getWidth(),BALL.getY() ) != PADDLE)
-            && (getElementAt(BALL.getX()+ BALL.getWidth(),BALL.getY() ) != heart1)
-            && (getElementAt(BALL.getX()+ BALL.getWidth(),BALL.getY() ) != heart2)
-            && (getElementAt(BALL.getX()+ BALL.getWidth(),BALL.getY() ) != heart3)
-            ) {
-                remove(getElementAt(BALL.getX() + BALL.getWidth(), BALL.getY() ));
-                vy *= -1;
-                amountOFBricks--;
-                pause(DELAY);
-            } {
+        ) {
+            remove(getElementAt(BALL.getX() , BALL.getY()));
+            vy *= -1;
+            amountOfBricks--;
+            changeWidthOfPaddle(amountOfBricks);
+            pause(DELAY);
+        }
+        if ((getElementAt(BALL.getX() + BALL.getWidth(),BALL.getY()) != null)
+                && (getElementAt(BALL.getX() + BALL.getWidth(),BALL.getY()) != FIELD)
+                && (getElementAt(BALL.getX()+ BALL.getWidth(),BALL.getY() ) != PADDLE)
+        ) {
+            remove(getElementAt(BALL.getX() + BALL.getWidth(), BALL.getY() ));
+            vy *= -1;
+            amountOfBricks--;
+            changeWidthOfPaddle(amountOfBricks);
+            pause(DELAY);
+        } {
             if ((getElementAt(BALL.getX() ,BALL.getY() + BALL.getHeight()) != null)
-            && (getElementAt(BALL.getX() ,BALL.getY() + BALL.getHeight()) != FIELD)
-            && (getElementAt(BALL.getX(),BALL.getY() + BALL.getHeight()) != PADDLE)
-            && (getElementAt(BALL.getX(),BALL.getY() + BALL.getHeight()) != heart1)
-            && (getElementAt(BALL.getX(),BALL.getY() + BALL.getHeight()) != heart2)
-            && (getElementAt(BALL.getX(),BALL.getY() + BALL.getHeight()) != heart3)
+                    && (getElementAt(BALL.getX() ,BALL.getY() + BALL.getHeight()) != FIELD)
+                    && (getElementAt(BALL.getX(),BALL.getY() + BALL.getHeight()) != PADDLE)
             ) {
                 remove(getElementAt(BALL.getX() , BALL.getY() + BALL.getHeight()));
                 vy *= -1;
-                amountOFBricks--;
+                amountOfBricks--;
+                changeWidthOfPaddle(amountOfBricks);
                 pause(10);
             }
             if ((getElementAt(BALL.getX() + BALL.getWidth(),BALL.getY() + BALL.getHeight()) != null)
-               && (getElementAt(BALL.getX() + BALL.getWidth(),BALL.getY() + BALL.getHeight()) != FIELD)
-               && (getElementAt(BALL.getX()+ BALL.getWidth(),BALL.getY() + BALL.getHeight()) != PADDLE)
-               && (getElementAt(BALL.getX()+ BALL.getWidth(),BALL.getY() + BALL.getHeight()) != heart1)
-               && (getElementAt(BALL.getX()+ BALL.getWidth(),BALL.getY() + BALL.getHeight()) != heart2)
-               && (getElementAt(BALL.getX()+ BALL.getWidth(),BALL.getY() + BALL.getHeight()) != heart3)
+                    && (getElementAt(BALL.getX() + BALL.getWidth(),BALL.getY() + BALL.getHeight()) != FIELD)
+                    && (getElementAt(BALL.getX()+ BALL.getWidth(),BALL.getY() + BALL.getHeight()) != PADDLE)
             ) {
                 remove(getElementAt(BALL.getX() + BALL.getWidth(), BALL.getY() + BALL.getHeight()));
                 vy *= -1;
-                amountOFBricks--;
+                amountOfBricks--;
+                changeWidthOfPaddle(amountOfBricks);
                 pause(10);
             }
 
 
-       }
+        }
 
 
 
@@ -341,9 +351,10 @@ public class Breakout extends GraphicsProgram {
 
 
         drawNeededHearts(3);
-        while (LIFES > 0 && !gameOver && amountOFBricks > 0) {
+        while (LIFES > 0 && !gameOver && amountOfBricks > 0) {
 
             moveBall();
+            //drawTraceLine(BALL.getX() + BALL.getWidth(), BALL.getY() + BALL.getHeight());
             checkCollisionBallWithBrick();
             checkBallCollisionWithWalls();
 
@@ -358,14 +369,22 @@ public class Breakout extends GraphicsProgram {
                     gameOver = true;
                 drawNeededHearts(LIFES);
             }
-           checkBallCollisionWithTopWall();
-           checkCollisionWithPaddle();
+            checkBallCollisionWithTopWall();
+            checkCollisionWithPaddle();
         }
 
-        if (amountOFBricks == 0 && LIFES > 0)
-            resultLabel("You have won!!!");
+
+        setFinalScreen(amountOfBricks == 0 && LIFES > 0);
+    }
+
+    private void setFinalScreen(boolean winner){
+        GImage finalScreen;
+        if (winner)
+            finalScreen = new GImage("winner.jpg");
         else
-            resultLabel("You've lost");
+            finalScreen = new GImage("losser.jpg");
+        finalScreen.setSize(getWidth(), getHeight());
+        add(finalScreen);
     }
 
 
