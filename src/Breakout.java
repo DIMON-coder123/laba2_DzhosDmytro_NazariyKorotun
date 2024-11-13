@@ -67,7 +67,7 @@ public class Breakout extends GraphicsProgram {
     public static GRect PADDLE;
     public static GOval BALL;
     public static GImage heart1, heart2, heart3;
-    public static GLine Trace;
+//    public static GLine Trace;
     private boolean gameOver = false;
     private int amountOFBricks = NBRICKS_PER_ROW * NBRICK_ROWS;
     public GRect FIELD;
@@ -128,10 +128,10 @@ public class Breakout extends GraphicsProgram {
         pause(DELAY);
     }
 
-    private void drawTraceLine(double x, double y) {
-        Trace = new GLine(x, y, x + vx, y + vy);
-        add(Trace);
-    }
+//    private void drawTraceLine(double x, double y) {
+//        Trace = new GLine(x, y, x + vx, y + vy);
+//        add(Trace);
+//    }
 
     private void checkBallCollisionWithWalls() {
         if (BALL.getX() < 0 || BALL.getX() > FIELD.getWidth()- BALL.getWidth())
@@ -241,38 +241,14 @@ public class Breakout extends GraphicsProgram {
         Color c = Color.red;
         for (int i = 0; i < NBRICKS_PER_ROW; i++) {
             for (int j = 0; j < NBRICK_ROWS; j++) {
-                switch (j) {
-                    case 0:
-                        c = Color.RED;
-                        break;
-                    case 1:
-                        c = Color.RED;
-                        break;
-                    case 2:
-                        c = Color.ORANGE;
-                        break;
-                    case 3:
-                        c = Color.ORANGE;
-                        break;
-                    case 4:
-                        c = Color.YELLOW;
-                        break;
-                    case 5:
-                        c = Color.YELLOW;
-                        break;
-                    case 6:
-                        c = Color.GREEN;
-                        break;
-                    case 7:
-                        c = Color.GREEN;
-                        break;
-                    case 8:
-                        c = Color.CYAN;
-                        break;
-                    case 9:
-                        c = Color.CYAN;
-                        break;
-                }
+                c = switch (j) {
+                    case 0, 1 -> Color.RED;
+                    case 2, 3 -> Color.ORANGE;
+                    case 4, 5 -> Color.YELLOW;
+                    case 6, 7 -> Color.GREEN;
+                    case 8, 9 -> Color.CYAN;
+                    default -> c;
+                };
                 drawBrick((i + 1) * BRICK_SEP + i * BRICK_WIDTH,  BRICK_Y_OFFSET + j * BRICK_HEIGHT + j * BRICK_SEP, c);
 
             }
@@ -284,19 +260,16 @@ public class Breakout extends GraphicsProgram {
 
     // TO FIX
     public void checkCollisionBallWithBrick() {
-            boolean isCollision = false;
             if ((getElementAt(BALL.getX() ,BALL.getY()) != null)
                 && (getElementAt(BALL.getX(),BALL.getY()) != FIELD)
                 && (getElementAt(BALL.getX(),BALL.getY() ) != PADDLE)
                 && (getElementAt(BALL.getX() ,PADDLE.getX()) != heart1)
                 && (getElementAt(BALL.getX() ,PADDLE.getX()) != heart2)
                 && (getElementAt(BALL.getX() ,PADDLE.getX()) != heart3)
-                && !isCollision
             ) {
                 remove(getElementAt(BALL.getX() , BALL.getY() ));
                 vy *= -1;
                 amountOFBricks--;
-                isCollision = true;
                 pause(DELAY);
             }
             if ((getElementAt(BALL.getX() + BALL.getWidth(),BALL.getY()) != null)
@@ -305,12 +278,10 @@ public class Breakout extends GraphicsProgram {
             && (getElementAt(BALL.getX()+ BALL.getWidth(),BALL.getY() ) != heart1)
             && (getElementAt(BALL.getX()+ BALL.getWidth(),BALL.getY() ) != heart2)
             && (getElementAt(BALL.getX()+ BALL.getWidth(),BALL.getY() ) != heart3)
-            && !isCollision
             ) {
                 remove(getElementAt(BALL.getX() + BALL.getWidth(), BALL.getY() ));
                 vy *= -1;
                 amountOFBricks--;
-                isCollision = true;
                 pause(DELAY);
             } {
             if ((getElementAt(BALL.getX() ,BALL.getY() + BALL.getHeight()) != null)
@@ -319,12 +290,10 @@ public class Breakout extends GraphicsProgram {
             && (getElementAt(BALL.getX(),BALL.getY() + BALL.getHeight()) != heart1)
             && (getElementAt(BALL.getX(),BALL.getY() + BALL.getHeight()) != heart2)
             && (getElementAt(BALL.getX(),BALL.getY() + BALL.getHeight()) != heart3)
-            && !isCollision
             ) {
                 remove(getElementAt(BALL.getX() , BALL.getY() + BALL.getHeight()));
                 vy *= -1;
                 amountOFBricks--;
-                isCollision = true;
                 pause(10);
             }
             if ((getElementAt(BALL.getX() + BALL.getWidth(),BALL.getY() + BALL.getHeight()) != null)
@@ -333,12 +302,10 @@ public class Breakout extends GraphicsProgram {
                && (getElementAt(BALL.getX()+ BALL.getWidth(),BALL.getY() + BALL.getHeight()) != heart1)
                && (getElementAt(BALL.getX()+ BALL.getWidth(),BALL.getY() + BALL.getHeight()) != heart2)
                && (getElementAt(BALL.getX()+ BALL.getWidth(),BALL.getY() + BALL.getHeight()) != heart3)
-                && !isCollision
             ) {
                 remove(getElementAt(BALL.getX() + BALL.getWidth(), BALL.getY() + BALL.getHeight()));
                 vy *= -1;
                 amountOFBricks--;
-                isCollision = true;
                 pause(10);
             }
 
