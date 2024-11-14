@@ -118,11 +118,7 @@ public class Breakout extends GraphicsProgram {
             checkBallCollisionWithTopWall();
             checkCollisionWithPaddle();
         }
-
-        if (amountOFBricks == 0 && LIFES > 0)
-            resultLabel("You have won!!!");
-        else
-            resultLabel("You've lost");
+        setFinalScreen(amountOFBricks == 0 && LIFES > 0);
     }
 
     /* ||||||| MOUSE events methods ||||||| */
@@ -351,15 +347,22 @@ public class Breakout extends GraphicsProgram {
         add(FIELD);
     }
 
+
     /**
-     * Draws result of game
-     * @param str {@code String} - result string
+     *  sets Final Screen
+     * @param winner (@code boolean) Result of the game, true - for the win, false - for the loose
      */
-    private void resultLabel(String str) {
-        GLabel label = new GLabel(str, FIELD.getWidth(), FIELD.getHeight() / 2);
-        label.setFont("Italic-30");
-        add(label);
+
+    private void setFinalScreen(boolean winner){
+        GImage finalScreen;
+        if (winner)
+            finalScreen = new GImage("winner.jpg");
+        else
+            finalScreen = new GImage("losser.jpg");
+        finalScreen.setSize(FIELD.getWidth(), FIELD.getHeight());
+        add(finalScreen);
     }
+
 
 
     /* ||||||| SET methods ||||||| */
