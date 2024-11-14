@@ -16,7 +16,7 @@ import java.awt.event.MouseEvent;
 
 /**
  * @implNote Breakout game class
- * @implNote Extends acm/graphic
+ * @implNote Extends acm/graphics
  */
 public class Breakout extends GraphicsProgram {
 
