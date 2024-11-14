@@ -205,6 +205,60 @@ public class Breakout extends GraphicsProgram {
             addCollisionSound();
             vy *= -speedBoost;
         }
+    }
+
+    /**
+     * /
+     * @param x (@code double)
+     * @param y (@code double)
+     * @return True if Ball collides with Brick
+     */
+
+    private boolean isCollidedWithBrick(double x, double y) {
+        return (getElementAt(x,y) != null)
+                && (getElementAt(x,y) != FIELD)
+                && (getElementAt(x,y) != PADDLE)
+                && (getElementAt(x,y) != heart1)
+                && (getElementAt(x,y) != heart2)
+                && (getElementAt(x,y) != heart3);
+    }
+
+
+    /**
+     * Checks collision between ball and brick
+     */
+    private void checkCollisionBallWithBrick() {
+        if (isCollidedWithBrick(BALL.getX(), BALL.getY())) {
+            addCollisionSound();
+            remove(getElementAt(BALL.getX() , BALL.getY() ));
+            vy *= -1;
+            amountOFBricks--;
+            pause(DELAY);
+        }
+
+        if (isCollidedWithBrick(BALL.getX() + BALL.getWidth(), BALL.getY())) {
+            addCollisionSound();
+            remove(getElementAt(BALL.getX() + BALL.getWidth(), BALL.getY()));
+            vy *= -1;
+            amountOFBricks--;
+            pause(DELAY);
+        }
+
+        if (isCollidedWithBrick(BALL.getX() , BALL.getY() + BALL.getHeight())) {
+            addCollisionSound();
+            remove(getElementAt(BALL.getX() , BALL.getY() + BALL.getHeight()));
+            vy *= -1;
+            amountOFBricks--;
+            pause(DELAY);
+        }
+
+        if (isCollidedWithBrick(BALL.getX() + BALL.getWidth(), BALL.getY() + BALL.getHeight())) {
+            addCollisionSound();
+            remove(getElementAt(BALL.getX() + BALL.getWidth(), BALL.getY() + BALL.getHeight()));
+            vy *= -1;
+            amountOFBricks--;
+            pause(DELAY);
+        }
 
     }
 
@@ -411,6 +465,15 @@ public class Breakout extends GraphicsProgram {
         setBallSpeed();
     }
 
+    /**
+     * Adds sound to collision event
+     */
+    private void addCollisionSound() {
+        SoundClip soundClip = new SoundClip("soundEffects/ballCollidesSound.wav");
+        soundClip.setVolume(1);
+        soundClip.play();
+    }
+
 
     /* ||||||| DELETE methods ||||||| */
 
@@ -451,70 +514,4 @@ public class Breakout extends GraphicsProgram {
         if (amount == 3)
             deleteALlHearts();
     }
-
-
-    /* ||||||| TO FIX methods ||||||| */
-
-    /**
-     * /
-     * @param x (@code double)
-     * @param y (@code double)
-     * @return True if Ball collides with Brick
-     */
-
-    private boolean isCollidedWithBrick(double x, double y) {
-        return (getElementAt(x,y) != null)
-                && (getElementAt(x,y) != FIELD)
-                && (getElementAt(x,y) != PADDLE)
-                && (getElementAt(x,y) != heart1)
-                && (getElementAt(x,y) != heart2)
-                && (getElementAt(x,y) != heart3);
-    }
-
-
-    /**
-     * Checks collision between ball and brick
-     */
-    private void checkCollisionBallWithBrick() {
-            if (isCollidedWithBrick(BALL.getX(), BALL.getY())) {
-                addCollisionSound();
-                remove(getElementAt(BALL.getX() , BALL.getY() ));
-                vy *= -1;
-                amountOFBricks--;
-                pause(DELAY);
-            }
-
-            if (isCollidedWithBrick(BALL.getX() + BALL.getWidth(), BALL.getY())) {
-                addCollisionSound();
-                remove(getElementAt(BALL.getX() + BALL.getWidth(), BALL.getY()));
-                vy *= -1;
-                amountOFBricks--;
-                pause(DELAY);
-            }
-
-            if (isCollidedWithBrick(BALL.getX() , BALL.getY() + BALL.getHeight())) {
-                addCollisionSound();
-                remove(getElementAt(BALL.getX() , BALL.getY() + BALL.getHeight()));
-                vy *= -1;
-                amountOFBricks--;
-                pause(DELAY);
-            }
-
-            if (isCollidedWithBrick(BALL.getX() + BALL.getWidth(), BALL.getY() + BALL.getHeight())) {
-                addCollisionSound();
-                remove(getElementAt(BALL.getX() + BALL.getWidth(), BALL.getY() + BALL.getHeight()));
-                vy *= -1;
-                amountOFBricks--;
-                pause(DELAY);
-            }
-
-    }
-
-    private void addCollisionSound() {
-        SoundClip soundClip = new SoundClip("soundEffects/ballCollidesSound.wav");
-        soundClip.setVolume(1);
-        soundClip.play();
-    }
-
-    /* ||||||| END(temporal) ||||||| */
 }
