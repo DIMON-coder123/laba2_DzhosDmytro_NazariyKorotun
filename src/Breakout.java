@@ -47,7 +47,7 @@ public class Breakout extends GraphicsProgram {
     private static final int NBRICKS_PER_ROW = 10;
 
     /** Number of rows of bricks */
-    private static final int NBRICK_ROWS = 10;
+    private static final int NBRICK_ROWS = 2;
 
     /** Separation between bricks */
     private static final int BRICK_SEP = 4;
@@ -78,7 +78,8 @@ public class Breakout extends GraphicsProgram {
     public static GImage heart1, heart2, heart3;
     private boolean gameOver = false;
     private int amountOFBricks = NBRICKS_PER_ROW * NBRICK_ROWS;
-    public GRect FIELD;
+    private GRect FIELD;
+    private SoundClip gameSoundClip;
 
 
     /* ||||||| START methods ||||||| */
@@ -100,8 +101,7 @@ public class Breakout extends GraphicsProgram {
         BRICK_WIDTH = (FIELD.getWidth() - (NBRICKS_PER_ROW + 1) * BRICK_SEP) / NBRICKS_PER_ROW;
         renderALlBricks();
         drawPaddle(FIELD.getWidth()  / 2 - PADDLE_WIDTH / 2, FIELD.getHeight() - PADDLE_Y_OFFSET);
-
-
+        addGameSound();
         drawNeededHearts(3);
         while (LIFES > 0 && !gameOver && amountOFBricks > 0) {
 
@@ -111,7 +111,7 @@ public class Breakout extends GraphicsProgram {
 
             checkBallCollisionWithBottomWall();
             if (vx == 0 && vy == 0){
-                pause(1000);
+                pause(3000);
                 remove(BALL);
                 deleteNeededHearts(LIFES);
                 setBall();
@@ -123,6 +123,9 @@ public class Breakout extends GraphicsProgram {
             checkBallCollisionWithTopWall();
             checkCollisionWithPaddle();
         }
+        gameSoundClip.stop();
+        pause(1000);
+        addFinalSound(amountOFBricks == 0 && LIFES > 0);
         setFinalScreen(amountOFBricks == 0 && LIFES > 0);
     }
 
@@ -194,6 +197,7 @@ public class Breakout extends GraphicsProgram {
         if (BALL.getY() + BALL.getHeight() > getHeight()) {
             vy = 0;
             vx = 0;
+            addLosingHeartSound();
         }
     }
 
@@ -438,10 +442,10 @@ public class Breakout extends GraphicsProgram {
      * Sets ball's speed
      */
     private void setBallSpeed() {
-        vx = rgen.nextDouble(1.0, 5.0);
+        vx = rgen.nextDouble(1.0, 4.5);
         if (rgen.nextBoolean(0.5))
             vx = -vx;
-        vy = rgen.nextDouble(1.0, 5.0);
+        vy = rgen.nextDouble(1.0, 4.5);
         if (rgen.nextBoolean(0.5))
             vy = -vy;
     }
@@ -473,6 +477,25 @@ public class Breakout extends GraphicsProgram {
         soundClip.setVolume(1);
         soundClip.play();
     }
+
+    private void addGameSound() {
+        gameSoundClip = new SoundClip("soundEffects/gameSound.wav");
+        gameSoundClip.setVolume(1);
+        gameSoundClip.loop();
+    }
+
+    private void addLosingHeartSound() {
+        SoundClip soundClip = new SoundClip("soundEffects/losingHeartSound.wav");
+        soundClip.setVolume(1);
+        soundClip.play();
+    }
+
+    private void addFinalSound(boolean winner) {
+        SoundClip finalSound = winner ? new SoundClip("soundEffects/winningSound.wav") : new SoundClip("soundEffects/gameOverSound.wav");
+        finalSound.setVolume(1);
+        finalSound.play();
+    }
+
 
 
     /* ||||||| DELETE methods ||||||| */
