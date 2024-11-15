@@ -47,7 +47,7 @@ public class Breakout extends GraphicsProgram {
     private static final int NBRICKS_PER_ROW = 10;
 
     /** Number of rows of bricks */
-    private static final int NBRICK_ROWS = 2;
+    private static final int NBRICK_ROWS = 10;
 
     /** Separation between bricks */
     private static final int BRICK_SEP = 4;
@@ -78,9 +78,10 @@ public class Breakout extends GraphicsProgram {
     public static GImage heart1, heart2, heart3;
     private boolean gameOver = false;
     private int amountOFBricks = NBRICKS_PER_ROW * NBRICK_ROWS;
+    private final int allBricks = NBRICKS_PER_ROW * NBRICK_ROWS;
     private GRect FIELD;
     private SoundClip gameSoundClip;
-
+    private GLabel score;
 
     /* ||||||| START methods ||||||| */
 
@@ -103,8 +104,9 @@ public class Breakout extends GraphicsProgram {
         drawPaddle(FIELD.getWidth()  / 2 - PADDLE_WIDTH / 2, FIELD.getHeight() - PADDLE_Y_OFFSET);
         addGameSound();
         drawNeededHearts(3);
-        while (LIFES > 0 && !gameOver && amountOFBricks > 0) {
 
+        while (LIFES > 0 && !gameOver && amountOFBricks > 0) {
+            scoreLabel();
             moveBall();
             checkCollisionBallWithBrick();
             checkBallCollisionWithWalls();
@@ -122,11 +124,14 @@ public class Breakout extends GraphicsProgram {
             }
             checkBallCollisionWithTopWall();
             checkCollisionWithPaddle();
+            remove(score);
         }
         gameSoundClip.stop();
         pause(1000);
+        scoreLabel();
         addFinalSound(amountOFBricks == 0 && LIFES > 0);
         setFinalScreen(amountOFBricks == 0 && LIFES > 0);
+
     }
 
     /* ||||||| MOUSE events methods ||||||| */
@@ -204,7 +209,7 @@ public class Breakout extends GraphicsProgram {
     /**
      * Checks collision between paddle and ball
      */
-    public void checkCollisionWithPaddle() {
+    private void checkCollisionWithPaddle() {
         if (PADDLE.getBounds().contains(BALL.getX() + BALL.getWidth(), BALL.getY() + BALL.getHeight())) {
             addCollisionSound();
             vy *= -speedBoost;
@@ -212,7 +217,7 @@ public class Breakout extends GraphicsProgram {
     }
 
     /**
-     * /
+     *
      * @param x (@code double)
      * @param y (@code double)
      * @return True if Ball collides with Brick
@@ -431,6 +436,13 @@ public class Breakout extends GraphicsProgram {
             finalScreen = new GImage("losser.jpg");
         finalScreen.setSize(FIELD.getWidth(), FIELD.getHeight());
         add(finalScreen);
+    }
+
+    private void scoreLabel() {
+        String scoreStr = "Your score:" + (allBricks - amountOFBricks);
+        score = new GLabel(scoreStr, FIELD.getWidth(), HEIGHT);
+        score.setFont("Italic-26");
+        add(score);
     }
 
 
