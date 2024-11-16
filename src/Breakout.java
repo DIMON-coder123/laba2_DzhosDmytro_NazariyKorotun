@@ -8,17 +8,14 @@
  */
 
 import acm.graphics.*;
-import acm.program.*;
 import acm.util.*;
 
-import acm.util.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import acm.graphics.GImage;
 import acm.program.GraphicsProgram;
 import acm.util.SoundClip;
 
-import java.awt.event.KeyEvent;
 /**
  * @implNote Breakout game class
  * @implNote Extends acm/graphics
@@ -67,22 +64,30 @@ public class Breakout extends GraphicsProgram {
     /** Speed for the ball*/
     private double vx, vy;
 
-    /** Params for built-in functions*/
+    /** Params for built-in methods*/
 
     private final RandomGenerator rgen = RandomGenerator.getInstance();
     private final int DELAY = 10;
-    private int LIFES = 3;
-    private final double speedBoost = 1;
-    public static GRect PADDLE;
-    public static GOval BALL;
+
+    /** Params for rendering in methods*/
+
     public static GImage heart1, heart2, heart3;
-    private boolean gameOver = false;
-    private int amountOFBricks = NBRICKS_PER_ROW * NBRICK_ROWS;
-    private final int allBricks = NBRICKS_PER_ROW * NBRICK_ROWS;
     private GRect FIELD;
-    private SoundClip gameSoundClip;
     private GLabel score;
     private GImage backgroundImage;
+    public static GRect PADDLE;
+    public static GOval BALL;
+
+    /** Variables for methods*/
+
+    private int LIFES = 3;
+    private final double speedBoost = 1;
+    private boolean gameOver = false;
+    private int amountOFBricks = NBRICKS_PER_ROW * NBRICK_ROWS;
+
+    /** Variable for sound methods*/
+
+    private SoundClip gameSoundClip;
 
 
     /* ||||||| START methods ||||||| */
@@ -97,12 +102,13 @@ public class Breakout extends GraphicsProgram {
     public void run() {
 
         /* You fill this in, along with any subsidiary methods */
+
         this.setSize(WIDTH * 2, HEIGHT + 60);
         addBackgroundImage(0,0);
         addField(0,0);
         setBall();
         BRICK_WIDTH = (FIELD.getWidth() - (NBRICKS_PER_ROW + 1) * BRICK_SEP) / NBRICKS_PER_ROW;
-        renderALlBricks();
+        renderAllBricks();
 
         drawPaddle(FIELD.getWidth()  / 2 - PADDLE_WIDTH / 2, FIELD.getHeight() - PADDLE_Y_OFFSET);
         addGameSound();
@@ -215,7 +221,7 @@ public class Breakout extends GraphicsProgram {
      * Checks collision between paddle and ball
      */
     private void checkCollisionWithPaddle() {
-        if (PADDLE.getBounds().contains(BALL.getX() + BALL.getWidth(), BALL.getY() + BALL.getHeight())) {
+        if (PADDLE.getBounds().contains(BALL.getX() + BALL.getWidth() , BALL.getY() + BALL.getHeight())) {
             addCollisionSound();
             vy *= -speedBoost;
         }
@@ -234,7 +240,8 @@ public class Breakout extends GraphicsProgram {
                 && (getElementAt(x,y) != heart1)
                 && (getElementAt(x,y) != heart2)
                 && (getElementAt(x,y) != heart3)
-                && (getElementAt(x,y)) != backgroundImage);
+                && (getElementAt(x,y)) != backgroundImage)
+                && (getElementAt(x,y) != score);
     }
 
 
@@ -248,6 +255,7 @@ public class Breakout extends GraphicsProgram {
             vy *= -1;
             amountOFBricks--;
             pause(DELAY);
+            return;
         }
 
         if (isCollidedWithBrick(BALL.getX() + BALL.getWidth(), BALL.getY())) {
@@ -256,6 +264,7 @@ public class Breakout extends GraphicsProgram {
             vy *= -1;
             amountOFBricks--;
             pause(DELAY);
+            return;
         }
 
         if (isCollidedWithBrick(BALL.getX() , BALL.getY() + BALL.getHeight())) {
@@ -264,6 +273,7 @@ public class Breakout extends GraphicsProgram {
             vy *= -1;
             amountOFBricks--;
             pause(DELAY);
+            return;
         }
 
         if (isCollidedWithBrick(BALL.getX() + BALL.getWidth(), BALL.getY() + BALL.getHeight())) {
@@ -387,7 +397,10 @@ public class Breakout extends GraphicsProgram {
      * @param c {@code Color} - color of brick
      */
     private void drawBrick(double x, double y, Color c) {
-        GRect brick = new GRect(x, y, BRICK_WIDTH, BRICK_HEIGHT);
+        GRect brick = new GRect(x,
+                y,
+                BRICK_WIDTH,
+                BRICK_HEIGHT);
         brick.setColor(c);
         brick.setFilled(true);
         add(brick);
@@ -396,7 +409,7 @@ public class Breakout extends GraphicsProgram {
     /**
      * Draws all bricks on screen
      */
-    private void renderALlBricks() {
+    private void renderAllBricks() {
         Color c = Color.red;
         for (int i = 0; i < NBRICKS_PER_ROW; i++) {
             for (int j = 0; j < NBRICK_ROWS; j++) {
@@ -457,6 +470,7 @@ public class Breakout extends GraphicsProgram {
      * Draws a score label
      */
     private void scoreLabel() {
+        int allBricks = NBRICKS_PER_ROW * NBRICK_ROWS;
         String scoreStr = "Your score:" + (allBricks - amountOFBricks);
         score = new GLabel(scoreStr, FIELD.getWidth(), HEIGHT - 5);
         score.setFont("Italic-26");
@@ -471,10 +485,10 @@ public class Breakout extends GraphicsProgram {
      * Sets ball's speed
      */
     private void setBallSpeed() {
-        vx = rgen.nextDouble(1.0, 3);
+        vx = rgen.nextDouble(1.0, 4);
         if (rgen.nextBoolean(0.5))
             vx = -vx;
-        vy = rgen.nextDouble(1.0, 3);
+        vy = rgen.nextDouble(1.0, 4);
         if (rgen.nextBoolean(0.5))
             vy = -vy;
     }
@@ -520,12 +534,18 @@ public class Breakout extends GraphicsProgram {
         soundClip.play();
     }
 
+    /**
+     * Adds sound to loosing one heart
+     */
     private void addLosingHeartSound() {
         SoundClip soundClip = new SoundClip("soundEffects/losingHeartSound.wav");
         soundClip.setVolume(1);
         soundClip.play();
     }
 
+    /**
+     * Adds sound after the game
+     */
     private void addFinalSound(boolean winner) {
         SoundClip finalSound = winner ? new SoundClip("soundEffects/winningSound.wav") : new SoundClip("soundEffects/gameOverSound.wav");
         finalSound.setVolume(1);
@@ -537,7 +557,7 @@ public class Breakout extends GraphicsProgram {
 
 
     /**
-     * Removes one heart from screen
+     * Removes first heart from screen
      */
     private void deleteOneHeart() {
         remove(heart1);
