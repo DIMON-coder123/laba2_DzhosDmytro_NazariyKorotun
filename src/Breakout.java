@@ -82,6 +82,7 @@ public class Breakout extends GraphicsProgram {
     private GRect FIELD;
     private SoundClip gameSoundClip;
     private GLabel score;
+    private GImage backgroundImage;
 
     /* ||||||| START methods ||||||| */
 
@@ -96,11 +97,12 @@ public class Breakout extends GraphicsProgram {
 
         /* You fill this in, along with any subsidiary methods */
         this.setSize(WIDTH * 2, HEIGHT + 60);
+        addBackgroundImage(0,0);
         addField(0,0);
         setBall();
-
         BRICK_WIDTH = (FIELD.getWidth() - (NBRICKS_PER_ROW + 1) * BRICK_SEP) / NBRICKS_PER_ROW;
         renderALlBricks();
+
         drawPaddle(FIELD.getWidth()  / 2 - PADDLE_WIDTH / 2, FIELD.getHeight() - PADDLE_Y_OFFSET);
         addGameSound();
         drawNeededHearts(3);
@@ -141,7 +143,7 @@ public class Breakout extends GraphicsProgram {
      * @param e {@code MouseEvent} the event to be processed
      */
     public void mouseMoved(MouseEvent e) {
-        if (!gameOver) {
+        if (!gameOver && PADDLE != null) {
             double x = e.getX();
             remove(PADDLE);
             PADDLE.setLocation(x, PADDLE.getY());
@@ -224,12 +226,13 @@ public class Breakout extends GraphicsProgram {
      */
 
     private boolean isCollidedWithBrick(double x, double y) {
-        return (getElementAt(x,y) != null)
+        return ((getElementAt(x,y) != null)
                 && (getElementAt(x,y) != FIELD)
                 && (getElementAt(x,y) != PADDLE)
                 && (getElementAt(x,y) != heart1)
                 && (getElementAt(x,y) != heart2)
-                && (getElementAt(x,y) != heart3);
+                && (getElementAt(x,y) != heart3)
+                && (getElementAt(x,y)) != backgroundImage);
     }
 
 
@@ -422,7 +425,6 @@ public class Breakout extends GraphicsProgram {
         add(FIELD);
     }
 
-
     /**
      *  sets Final Screen
      * @param winner (@code boolean) Result of the game, true - for the win, false - for the loose
@@ -440,7 +442,7 @@ public class Breakout extends GraphicsProgram {
 
     private void scoreLabel() {
         String scoreStr = "Your score:" + (allBricks - amountOFBricks);
-        score = new GLabel(scoreStr, FIELD.getWidth(), HEIGHT);
+        score = new GLabel(scoreStr, FIELD.getWidth(), HEIGHT - 5);
         score.setFont("Italic-26");
         add(score);
     }
@@ -454,10 +456,10 @@ public class Breakout extends GraphicsProgram {
      * Sets ball's speed
      */
     private void setBallSpeed() {
-        vx = rgen.nextDouble(1.0, 4.5);
+        vx = rgen.nextDouble(1.0, 3);
         if (rgen.nextBoolean(0.5))
             vx = -vx;
-        vy = rgen.nextDouble(1.0, 4.5);
+        vy = rgen.nextDouble(1.0, 3);
         if (rgen.nextBoolean(0.5))
             vy = -vy;
     }
@@ -506,6 +508,13 @@ public class Breakout extends GraphicsProgram {
         SoundClip finalSound = winner ? new SoundClip("soundEffects/winningSound.wav") : new SoundClip("soundEffects/gameOverSound.wav");
         finalSound.setVolume(1);
         finalSound.play();
+    }
+
+    private void addBackgroundImage(int x, int y) {
+        backgroundImage = new GImage("backgroundImage.jpg",x, y);
+        backgroundImage.setSize(getWidth(),getHeight());
+        backgroundImage.sendToFront();
+        add(backgroundImage);
     }
 
 
