@@ -84,6 +84,7 @@ public class Breakout extends GraphicsProgram {
     private GLabel score;
     private GImage backgroundImage;
 
+
     /* ||||||| START methods ||||||| */
 
 
@@ -136,7 +137,9 @@ public class Breakout extends GraphicsProgram {
 
     }
 
+
     /* ||||||| MOUSE events methods ||||||| */
+
 
     /**
      * Runs everytime mouse has been moved
@@ -224,7 +227,6 @@ public class Breakout extends GraphicsProgram {
      * @param y (@code double)
      * @return True if Ball collides with Brick
      */
-
     private boolean isCollidedWithBrick(double x, double y) {
         return ((getElementAt(x,y) != null)
                 && (getElementAt(x,y) != FIELD)
@@ -426,10 +428,21 @@ public class Breakout extends GraphicsProgram {
     }
 
     /**
-     *  sets Final Screen
+     * Draws a background in position
+     * @param x {@code int} - position X
+     * @param y {@code int} - position Y
+     */
+    private void addBackgroundImage(int x, int y) {
+        backgroundImage = new GImage("backgroundImage.jpg",x, y);
+        backgroundImage.setSize(getWidth(),getHeight());
+        backgroundImage.sendToFront();
+        add(backgroundImage);
+    }
+
+    /**
+     *  Sets and draws a 'Final Screen'
      * @param winner (@code boolean) Result of the game, true - for the win, false - for the loose
      */
-
     private void setFinalScreen(boolean winner){
         GImage finalScreen;
         if (winner)
@@ -440,13 +453,15 @@ public class Breakout extends GraphicsProgram {
         add(finalScreen);
     }
 
+    /**
+     * Draws a score label
+     */
     private void scoreLabel() {
         String scoreStr = "Your score:" + (allBricks - amountOFBricks);
         score = new GLabel(scoreStr, FIELD.getWidth(), HEIGHT - 5);
         score.setFont("Italic-26");
         add(score);
     }
-
 
 
     /* ||||||| SET methods ||||||| */
@@ -483,6 +498,19 @@ public class Breakout extends GraphicsProgram {
         setBallSpeed();
     }
 
+
+    /* ||||||| SOUND methods ||||||| */
+
+
+    /**
+     * Adds sound on background
+     */
+    private void addGameSound() {
+        gameSoundClip = new SoundClip("soundEffects/gameSound.wav");
+        gameSoundClip.setVolume(1);
+        gameSoundClip.loop();
+    }
+
     /**
      * Adds sound to collision event
      */
@@ -490,12 +518,6 @@ public class Breakout extends GraphicsProgram {
         SoundClip soundClip = new SoundClip("soundEffects/ballCollidesSound.wav");
         soundClip.setVolume(1);
         soundClip.play();
-    }
-
-    private void addGameSound() {
-        gameSoundClip = new SoundClip("soundEffects/gameSound.wav");
-        gameSoundClip.setVolume(1);
-        gameSoundClip.loop();
     }
 
     private void addLosingHeartSound() {
@@ -509,14 +531,6 @@ public class Breakout extends GraphicsProgram {
         finalSound.setVolume(1);
         finalSound.play();
     }
-
-    private void addBackgroundImage(int x, int y) {
-        backgroundImage = new GImage("backgroundImage.jpg",x, y);
-        backgroundImage.setSize(getWidth(),getHeight());
-        backgroundImage.sendToFront();
-        add(backgroundImage);
-    }
-
 
 
     /* ||||||| DELETE methods ||||||| */
